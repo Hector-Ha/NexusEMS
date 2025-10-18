@@ -1,6 +1,6 @@
-# Nexus EMS - Basic Employee Management System (EMS)
+# Employee Management System (EMS)
 
-A full-stack web application for managing employee records, tracking retirement timelines, and maintaining organizational staff information. Built with React, GraphQL, Express, and MongoDB.
+A full-stack web application for managing employee records, tracking retirement timelines, and maintaining organizational staff information. Built with a monorepo structure containing separate API and UI directories using React, GraphQL, Express, and MongoDB.
 
 ## Features
 
@@ -13,6 +13,7 @@ A full-stack web application for managing employee records, tracking retirement 
 - **GraphQL API**: Modern API with efficient querying and real-time data management
 - **Form Validation**: Client-side validation with real-time error feedback during form input
 - **Dynamic Navigation**: Icon-based sidebar navigation with breadcrumb tracking
+- **Reusable Components**: Modular component library for buttons, inputs, and common UI elements
 
 ## Tech Stack
 
@@ -33,6 +34,66 @@ A full-stack web application for managing employee records, tracking retirement 
 - **Webpack 5** - Module bundler with Babel transpilation
 - **CSS Loader & Style Loader** - CSS management
 
+## Project Structure
+
+```
+fullstackgroup/
+├── api/
+│   ├── server/
+│   │   ├── app.js                 # Apollo Server setup, GraphQL schema, resolvers
+│   │   ├── db.js                  # MongoDB schema definitions and database functions
+│   │   └── package.json           # Backend dependencies
+│   ├── env.env                    # Backend environment variables
+│   ├── package-lock.json          # Dependency lock file
+│   └── package.json               # Backend root dependencies
+│
+├── ui/
+│   ├── public/
+│   │   ├── index.html             # Main HTML entry point
+│   │   ├── app.bundle.js          # Compiled React application bundle
+│   │   ├── app.bundle.js.map      # Source map for debugging
+│   │   ├── vendors.bundle.js      # Vendor libraries bundle
+│   │   └── vendors.bundle.js.map  # Vendor source map
+│   │
+│   ├── src/
+│   │   ├── index.js               # React entry point (compiled by Webpack)
+│   │   │
+│   │   ├── Core Components
+│   │   ├── App.jsx                # Main app component with routing and layout
+│   │   ├── Home.jsx               # Dashboard/home page
+│   │   ├── Navbar.jsx             # Top navigation bar
+│   │   ├── Sidebar.jsx            # Sidebar navigation with icons
+│   │   ├── NotFound.jsx           # 404 error page
+│   │   │
+│   │   ├── Employee Pages
+│   │   ├── EmployeeList.jsx       # Employee listing with filtering and deletion
+│   │   ├── EmployeeCreate.jsx     # Form for adding new employees with validation
+│   │   ├── EmployeeDetails.jsx    # Individual employee view with retirement info
+│   │   ├── EmployeeUpdate.jsx     # Update employee title, department, and status
+│   │   │
+│   │   ├── Feature Pages
+│   │   ├── UpcomingRetirement.jsx # List employees retiring in next 6 months
+│   │   ├── About.jsx              # About page
+│   │   │
+│   │   ├── Reusable Components
+│   │   ├── Button.jsx             # Custom button component with variants
+│   │   ├── TextInput.jsx          # Custom text input with validation
+│   │   ├── StaffGrid.jsx          # Reusable grid component for employee tables
+│   │   ├── StaffItem.jsx          # Individual staff row/card item
+│   │   ├── StaffAdd.jsx           # Staff addition component (alternative form)
+│   │   └── About.jsx              # About information page
+│   │
+│   ├── env.env                    # Frontend environment variables
+│   ├── webpack.config.js          # Webpack configuration for bundling
+│   ├── .eslintrc.json            # ESLint rules configuration
+│   ├── .eslintignore             # ESLint ignore file
+│   ├── package-lock.json          # Dependency lock file
+│   ├── package.json               # Frontend dependencies and scripts
+│   └── app.js                     # Express server for UI (serves public folder)
+│
+└── README.md                      # This file
+```
+
 ## Installation & Setup
 
 ### Prerequisites
@@ -40,138 +101,107 @@ A full-stack web application for managing employee records, tracking retirement 
 - Node.js v14 or higher
 - MongoDB instance (local or MongoDB Atlas connection string)
 - npm or yarn package manager
+- Git
 
-### Step 1: Clone Repository Or Download File
+### Step 1: Clone Repository
 
 ```bash
 git clone <repository-url>
-cd ems
+cd fullstackgroup
 ```
 
-### Step 2: Install Dependencies
+### Step 2: Backend Setup
+
+Navigate to the API directory and configure environment variables:
 
 ```bash
-# Install frontend dependencies
-cd ui
-npm install
-
-# Install backend dependencies
 cd api
-npm install
-cd ..
 ```
 
-### Step 3: Build Frontend Assets
+Create or update `env.env` file:
+
+```
+DB_URL=mongodb+srv://your-username:your-password@cluster.mongodb.net/ems?retryWrites=true&w=majority
+API_SERVER_PORT=4000
+ENABLE_CORS=true
+```
+
+Install backend dependencies:
+
+```bash
+npm install
+```
+
+### Step 3: Frontend Setup
+
+Navigate to the UI directory and configure environment variables:
+
+```bash
+cd ../ui
+```
+
+Create or update `env.env` file:
+
+```
+API_PROXY_TARGET=http://localhost:4000/graphql
+UI_SERVER_PORT=3000
+```
+
+Install frontend dependencies:
+
+```bash
+npm install
+```
+
+### Step 4: Build Frontend Assets
 
 ```bash
 npm run build
 ```
 
-This runs Webpack to transpile React/JSX and bundle assets into `public/`.
+This runs Webpack to transpile React/JSX and bundle assets into `public/`. Output includes:
 
-### Step 4: Start Development Servers
+- `app.bundle.js` - Application code
+- `vendors.bundle.js` - Third-party libraries
+- Source maps for debugging
 
-**Option A: Sequential (one terminal)**
+### Step 5: Start Development Servers
 
-```bash
-# Terminal 1: Start backend
-cd server && npm start
-
-# Terminal 2: Start frontend
-cd ui && npm start
-```
-
-**Option B: Concurrent (with concurrently package)**
+**Terminal 1 - Start Backend API:**
 
 ```bash
-npm run dev:all
+cd api
+npm start
 ```
 
-The application will be accessible at `http://localhost:3000` with the GraphQL endpoint at `http://localhost:4000/graphql`.
+Expected output:
 
-## Frontend Components
+```
+Connected to MongoDB server
+EMS Server running at http://localhost:4000
+GraphQL endpoint at http://localhost:4000/graphql
+```
 
-### App.jsx
+**Terminal 2 - Start Frontend UI:**
 
-Main application component handling routing and overall layout. Features:
+```bash
+cd ui
+npm start
+```
 
-- React Router setup with protected routes
-- Dynamic breadcrumb navigation
-- Two-column layout with sticky sidebar
-- Responsive Bootstrap grid system
+Expected output:
 
-### EmployeeList.jsx
+```
+EMS UI Server running at http://localhost:3000
+```
 
-Employee listing page with:
-
-- Query all employees via GraphQL
-- Filter by employee type (Full-Time, Part-Time, Contract, Seasonal)
-- Click row to view employee details
-- Delete functionality with status validation
-- Responsive grid display via StaffGrid component
-
-### EmployeeCreate.jsx
-
-Employee creation form with comprehensive validation:
-
-- **First/Last Name**: Required, trimmed whitespace
-- **Age**: Required, must be between 20-70
-- **Join Date**: Required, cannot be in the future
-- **Title**: Required enum (Employee, Manager, Director, VP)
-- **Department**: Required enum (IT, Marketing, HR, Engineering)
-- **Employee Type**: Required enum (FullTime, PartTime, Contract, Seasonal)
-- Real-time validation on blur, full validation on submit
-- Loading state with spinner feedback
-- Success message with redirect to employee list
-
-### EmployeeDetails.jsx
-
-Individual employee view displaying:
-
-- Basic information (name, age, title, department, status)
-- Comprehensive retirement information section
-- Retirement date calculation
-- Time until retirement formatted (years, months, days)
-- Retirement status indicator
-- Edit button linking to update form
-- Responsive styling with mobile optimization
-
-### EmployeeUpdate.jsx
-
-Employee update form allowing modification of:
-
-- **Title**: Career level (Employee, Manager, Director, VP)
-- **Department**: Current department assignment
-- **Status**: Active/Inactive toggle
-- Validates that employee is not active before deletion (enforced in list)
-- Loads current values on mount
-- Confirmation message on successful update
-
-### UpcomingRetirement.jsx
-
-HR planning view showing:
-
-- Employees retiring within next 6 months
-- Filters by employee type
-- Displays retirement countdown
-- Integration with EmployeeGrid for consistent display
-- Empty state messaging when no upcoming retirements
-
-### Sidebar.jsx
-
-Navigation component with:
-
-- Icon-based navigation using React Icons
-- Links to all major sections (Home, Employees, Create, Retirement, About)
-- Sticky positioning for scroll accessibility
-- Active link highlighting
-- Responsive collapse on mobile
+Access the application at `http://localhost:3000`
 
 ## GraphQL API Documentation
 
 ### Queries
 
-**Get All Staff**
+**Get All Staff with Filtering**
 
 ```graphql
 query {
@@ -189,11 +219,13 @@ query {
 }
 ```
 
+Accepted filter values: "All", "FullTime", "PartTime", "Contract", "Seasonal"
+
 **Get Staff By ID with Retirement Info**
 
 ```graphql
 query {
-  staffById(id: "employee-mongodb-id") {
+  staffById(id: "mongodb-object-id") {
     _id
     FirstName
     LastName
@@ -223,17 +255,22 @@ query {
     _id
     FirstName
     LastName
+    Age
+    DateOfJoining
+    Title
+    Department
+    EmployeeType
+    CurrentStatus
     retirementInfo {
       retirementDate
-      yearsUntilRetirement
-      monthsUntilRetirement
       daysUntilRetirement
+      monthsUntilRetirement
+      yearsUntilRetirement
+      isRetired
     }
   }
 }
 ```
-
-Filter parameter accepts: "All", "FullTime", "PartTime", "Contract", "Seasonal"
 
 ### Mutations
 
@@ -296,7 +333,7 @@ mutation DeleteStaff($id: ID!) {
 }
 ```
 
-Returns boolean. Throws error if employee status is Active.
+Returns boolean. Throws error if employee CurrentStatus is true (Active).
 
 ## Database Schema
 
@@ -318,100 +355,248 @@ Returns boolean. Throws error if employee status is Active.
 
 ## Retirement Calculation Logic
 
-The system calculates retirement based on:
+The system calculates employee retirement based on:
 
 1. **Retirement Age**: Fixed at 65 years old
-2. **Age at Joining**: Derived from current age and years since joining
+2. **Age at Joining**: Calculated from current age and years employed
 3. **Years to Work**: 65 minus age at joining
 4. **Retirement Date**: Joining date plus years to work
 
-The calculation provides:
+**Calculation Provides**:
 
 - Exact retirement date (year, month, day)
 - Years, months, and days until retirement
 - Total days until retirement (for reference)
 - Retirement status (already retired or not)
 
-Employees retiring within 6 months appear in the "Upcoming Retirement" list.
+**Upcoming Retirements**: Employees retiring within 6 months appear in the "Upcoming Retirement" list for HR planning purposes.
 
 ## Development Scripts
 
+### Backend (API) Scripts
+
 ```bash
+cd api
+
+# Start backend server with nodemon (auto-reload on file changes)
+npm start
+
+# Alternative: Start with nodemon watching server directory
+npm run dev
+```
+
+### Frontend (UI) Scripts
+
+```bash
+cd ui
+
 # Build frontend assets with Webpack
 npm run build
 
-# Start backend server with nodemon (auto-reload)
+# Start frontend UI server
 npm start
 
-# Lint code with ESLint
+# Run ESLint code quality checks
 npm run lint
 
-# Fix linting issues automatically
+# Fix ESLint issues automatically
 npm run lint:fix
-
-# Concurrent server startup (if configured)
-npm run dev:all
 ```
 
-## Build & Deployment
+## Webpack Configuration
+
+The frontend uses Webpack 5 for bundling React components and assets.
+
+**Configuration Details** (`webpack.config.js`):
+
+- **Mode**: Development (enables source maps for debugging)
+- **Entry Point**: `src/index.js`
+- **Output**: `public/[name].bundle.js`
+- **Loaders**:
+  - Babel: Transpiles JSX and ES6+ syntax
+  - CSS/Style: Processes and injects CSS
+- **Code Splitting**:
+  - Separates vendors and application code
+  - Creates `vendors.bundle.js` and `app.bundle.js`
+- **Source Maps**: Enabled for debugging in browser DevTools
+- **Extensions Resolved**: `.js`, `.jsx`
+
+**Build Output**:
+
+```
+public/
+├── app.bundle.js
+├── app.bundle.js.map
+├── vendors.bundle.js
+├── vendors.bundle.js.map
+└── index.html
+```
+
+## Environment Variables
+
+### Backend (`api/env.env`)
+
+```
+DB_URL=mongodb+srv://username:password@cluster.mongodb.net/ems?retryWrites=true&w=majority
+API_SERVER_PORT=4000
+ENABLE_CORS=true
+```
+
+**Variables Explained**:
+
+- `DB_URL`: MongoDB connection string with credentials
+- `API_SERVER_PORT`: Port for GraphQL API server
+- `ENABLE_CORS`: Enable/disable CORS middleware
+
+### Frontend (`ui/env.env`)
+
+```
+API_PROXY_TARGET=http://localhost:4000/graphql
+UI_SERVER_PORT=3000
+```
+
+**Variables Explained**:
+
+- `API_PROXY_TARGET`: Backend GraphQL endpoint URL
+- `UI_SERVER_PORT`: Port for frontend UI server
 
 ## Error Handling
 
-The application handles:
+The application handles various error scenarios:
 
-- **Validation Errors**: Age constraints (20-70), required fields, date validation
-- **Deletion Restrictions**: Cannot delete active employees
-- **MongoDB Connection Failures**: 5-second timeout, process exit on failure
-- **GraphQL Errors**: Captured and displayed in UI alerts
-- **Network Errors**: User-friendly error messages
-- **Not Found**: 404 page for invalid routes
+**Validation Errors**:
+
+- Age constraints enforced (20-70 years)
+- Required field validation
+- Date validation (cannot be in future)
+- Field-level error messages on blur
+
+**Deletion Restrictions**:
+
+- Cannot delete employees with Active status (CurrentStatus: true)
+- Error message: "CAN'T DELETE EMPLOYEE — STATUS ACTIVE"
+- User must set status to Inactive first
+
+**MongoDB Connection**:
+
+- 5-second timeout (`serverSelectionTimeoutMS`)
+- Process exits on connection failure
+- Connection errors logged to console
+
+**GraphQL Errors**:
+
+- Server errors captured and displayed in UI alerts
+- Validation errors shown inline with forms
+- Network errors displayed as user-friendly messages
+
+**Navigation Errors**:
+
+- 404 page for invalid routes
+- Not Found page for non-existent employee IDs
+- Links to return to home or employee list
 
 ## Troubleshooting
 
 **MongoDB Connection Error**
 
-- Verify connection string in `env.env` is correct
-- Check MongoDB Atlas IP whitelist includes your machine
-- Ensure network access credentials are valid
-- Check `serverSelectionTimeoutMS` setting (currently 5 seconds)
+```
+Error: connect ECONNREFUSED
+```
 
-**Webpack Build Issues**
+- Verify MongoDB is running (local) or Atlas connection is correct
+- Check connection string in `api/env.env`
+- Verify MongoDB Atlas IP whitelist includes your machine
+- Confirm database credentials are valid
+- Test connection: `mongo "your-connection-string"`
 
-- Delete `node_modules/` and `public/` directories
-- Run `npm install` and `npm run build` again
-- Ensure all required loaders are installed
+**Webpack Build Fails**
 
-**CORS Errors**
+```
+Error: Cannot find module 'babel-loader'
+```
 
-- Verify `ENABLE_CORS=true` in backend `env.env`
-- Check that frontend makes requests to `http://localhost:4000/graphql`
-- Confirm `API_PROXY_TARGET` matches backend URL
+- Delete `node_modules/` and `package-lock.json`
+- Run `npm install` again
+- Ensure all loaders are installed: `npm install --save-dev babel-loader @babel/core @babel/preset-env @babel/preset-react css-loader style-loader`
+- Run `npm run build`
+
+**CORS Errors in Browser Console**
+
+```
+Access to XMLHttpRequest blocked by CORS policy
+```
+
+- Verify `ENABLE_CORS=true` in `api/env.env`
+- Check that frontend makes requests to correct backend URL
+- Confirm backend is running on port 4000
+- Verify `API_PROXY_TARGET` in `ui/env.env` matches backend
 
 **Form Validation Not Working**
 
 - Ensure all required fields are filled before submission
-- Check browser console for validation error details
-- Verify date format matches expected format (YYYY-MM-DD)
+- Check browser console for JavaScript errors
+- Verify date format is YYYY-MM-DD
+- Age must be numeric between 20-70
+- Clear browser cache and rebuild: `npm run build`
 
-## Security Considerations
+**Port Already in Use**
 
-- **Age Constraint**: Database schema enforces 20-70 age range
-- **Enum Validation**: GraphQL enums restrict Title, Department, EmployeeType values
-- **Status Protection**: Active employees cannot be deleted
-- **CORS**: Configured to accept requests from trusted origins
-- **Input Sanitization**: First/Last names trimmed to remove whitespace
+```
+Error: listen EADDRINUSE: address already in use :::4000
+```
+
+- Find process using port: `lsof -i :4000` (Mac/Linux) or `netstat -ano | findstr :4000` (Windows)
+- Kill process or change port in `env.env`
+- Alternatively: `kill -9 <PID>` (Mac/Linux)
+
+**Build Takes Too Long**
+
+- First build with source maps is slower
+- Subsequent builds use cache
+- Run in production mode for faster build: `NODE_ENV=production npm run build`
+
+## Code Quality
+
+### ESLint Configuration
+
+The project uses ESLint to maintain code quality. Configuration in `.eslintrc.json`:
+
+```json
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended"
+  ],
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2021": true
+  }
+}
+```
+
+Ignored files (`.eslintignore`):
+
+- `node_modules/`
+- `public/`
+- `*.bundle.js`
+- Build artifacts
 
 ## Future Enhancements
 
 Potential features for future versions:
 
-- User authentication and authorization
-- Employee search functionality
-- Bulk employee import/export
-- Advanced filtering and sorting
-- Employee performance reviews
-- Attendance tracking
-- Leave management
+- User authentication and authorization system
+- Employee search with advanced filtering
+- Bulk employee import/export (CSV/Excel)
+- Advanced sorting and pagination
+- Employee performance reviews module
+- Attendance tracking system
+- Leave management system
 - Email notifications for upcoming retirements
-- Dashboard with analytics
+- Analytics dashboard with charts
 - Dark mode UI option
+- Mobile native app (React Native)
+- Activity audit logs
+- Role-based access control (RBAC)
