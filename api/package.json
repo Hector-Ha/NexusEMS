@@ -1,0 +1,21 @@
+{
+  "name": "ems-api",
+  "version": "1.0.0",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "nodemon -w server server/app.js",
+    "dev": "nodemon -w server server/app.js"
+  },
+  "dependencies": {
+    "apollo-server-express": "^3.13.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "graphql": "^16.11.0",
+    "graphql-scalars": "^1.24.2",
+    "mongoose": "^8.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
