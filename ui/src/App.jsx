@@ -1,13 +1,19 @@
 import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import "./styles.css";
 import {
   BrowserRouter as Router,
   Route,
   Routes,
-  useLocation,
   Link,
+  NavLink,
 } from "react-router-dom";
-import { Container, Row, Col, Breadcrumb, Navbar } from "react-bootstrap";
+import {
+  BsHouseDoor,
+  BsPeople,
+  BsPersonPlus,
+  BsCalendarEvent,
+  BsInfoCircle,
+} from "react-icons/bs";
 
 import Home from "./Home.jsx";
 import EmployeeList from "./EmployeeList.jsx";
@@ -18,85 +24,84 @@ import About from "./About.jsx";
 import UpcomingRetirement from "./UpcomingRetirement.jsx";
 import NotFound from "./NotFound.jsx";
 
-// Import the new Sidebar component with icons
-import SidebarNav from "./Sidebar.jsx";
+const Navbar = () => (
+  <nav className="saas-navbar">
+    <Link to="/" className="brand">
+      <div className="brand-icon">N</div>
+      <span>NexusEMS</span>
+    </Link>
+    <div className="nav-actions"></div>
+  </nav>
+);
 
-// Dynamic Breadcrumb component
-const Breadcrumbs = () => {
-  const location = useLocation();
-  const pathnames = location.pathname.split("/").filter((x) => x);
+const Sidebar = () => {
+  const mainLinks = [
+    { to: "/", label: "Dashboard", icon: <BsHouseDoor /> },
+    { to: "/employees", label: "Employees", icon: <BsPeople /> },
+    { to: "/employees/create", label: "Add Employee", icon: <BsPersonPlus /> },
+  ];
 
-  const labelMap = {
-    employees: "Employee List",
-    create: "Add Employee",
-    update: "Update Employee",
-    retirement: "Upcoming Retirement",
-    about: "About",
-  };
+  const otherLinks = [
+    { to: "/retirement", label: "Retirement", icon: <BsCalendarEvent /> },
+    { to: "/about", label: "About", icon: <BsInfoCircle /> },
+  ];
 
   return (
-    <Breadcrumb className="mt-3">
-      <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/" }}>
-        Home
-      </Breadcrumb.Item>
-      {pathnames.map((value, index) => {
-        const to = "/" + pathnames.slice(0, index + 1).join("/");
-        const isLast = index === pathnames.length - 1;
-        return (
-          <Breadcrumb.Item
-            key={to}
-            linkAs={Link}
-            linkProps={{ to }}
-            active={isLast}
+    <aside className="saas-sidebar">
+      <div className="nav-section">
+        <div className="nav-section-title">Main Menu</div>
+        {mainLinks.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            end={link.to === "/"}
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }
           >
-            {labelMap[value] || value.charAt(0).toUpperCase() + value.slice(1)}
-          </Breadcrumb.Item>
-        );
-      })}
-    </Breadcrumb>
+            <span className="icon">{link.icon}</span>
+            <span>{link.label}</span>
+          </NavLink>
+        ))}
+      </div>
+      <div className="nav-section">
+        <div className="nav-section-title">Reports</div>
+        {otherLinks.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : ""}`
+            }
+          >
+            <span className="icon">{link.icon}</span>
+            <span>{link.label}</span>
+          </NavLink>
+        ))}
+      </div>
+    </aside>
   );
 };
 
 const AppLayout = () => {
   return (
     <>
-      {/* Top Navbar - minimal */}
-      <Navbar bg="light" variant="light" className="border-bottom shadow-sm">
-        <Container fluid>
-          <Navbar.Brand as={Link} to="/" className="fw-bold text-primary">
-            EMS
-          </Navbar.Brand>
-        </Container>
-      </Navbar>
-
-      {/* Page Layout */}
-      <Container fluid className="mt-3">
-        <Breadcrumbs />
-
-        <Row>
-          {/* Sidebar Navigation with icons */}
-          <Col xs={12} md={3} lg={2} className="p-0">
-            <SidebarNav />
-          </Col>
-
-          {/* Main Content */}
-          <Col xs={12} md={9} lg={10}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/employees" element={<EmployeeList />} />
-              <Route path="/employees/create" element={<EmployeeCreate />} />
-              <Route path="/employees/:id" element={<EmployeeDetails />} />
-              <Route
-                path="/employees/:id/update"
-                element={<EmployeeUpdate />}
-              />
-              <Route path="/about" element={<About />} />
-              <Route path="/retirement" element={<UpcomingRetirement />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Col>
-        </Row>
-      </Container>
+      <Navbar />
+      <div className="app-layout">
+        <Sidebar />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/employees" element={<EmployeeList />} />
+            <Route path="/employees/create" element={<EmployeeCreate />} />
+            <Route path="/employees/:id" element={<EmployeeDetails />} />
+            <Route path="/employees/:id/update" element={<EmployeeUpdate />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/retirement" element={<UpcomingRetirement />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+      </div>
     </>
   );
 };

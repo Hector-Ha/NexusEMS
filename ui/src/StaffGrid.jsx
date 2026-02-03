@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Alert, Spinner, Button, Badge } from "react-bootstrap";
+import { BsEye, BsTrash, BsPersonX } from "react-icons/bs";
 
 const isActive = (status) =>
   status === true || status === "Active" || status === 1 || status === "1";
@@ -7,22 +7,28 @@ const isActive = (status) =>
 const typeVariant = (type) => {
   switch (type) {
     case "FullTime":
-      return "success";
+      return "badge-success";
     case "PartTime":
-      return "info";
+      return "badge-info";
     case "Contract":
-      return "warning";
+      return "badge-warning";
     case "Seasonal":
-      return "secondary";
+      return "badge-secondary";
     default:
-      return "secondary";
+      return "badge-secondary";
   }
 };
 
 const formatDate = (v) => {
   if (!v) return "";
   const d = new Date(v);
-  return Number.isNaN(d.getTime()) ? v : d.toDateString();
+  return Number.isNaN(d.getTime())
+    ? v
+    : d.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
 };
 
 const StaffGrid = ({
@@ -31,100 +37,135 @@ const StaffGrid = ({
   error,
   onRowClick,
   onDelete,
+  title = "Employees",
   filterControl,
 }) => {
-  if (loading)
+  if (loading) {
     return (
-      <div className="text-center">
-        <Spinner animation="border" variant="success" />
+      <div className="loading-wrapper">
+        <div className="spinner"></div>
       </div>
     );
+  }
 
-  if (error) return <Alert variant="danger">Error: {error}</Alert>;
-  if (!employees || employees.length === 0)
-    return <Alert variant="info">No employees found.</Alert>;
+  if (error) {
+    return <div className="alert alert-danger">Error: {error}</div>;
+  }
+
+  if (!employees || employees.length === 0) {
+    return (
+      <div className="data-table-wrapper">
+        <div className="data-table-header">
+          <h2>{title}</h2>
+          {filterControl}
+        </div>
+        <div className="empty-state">
+          <BsPersonX className="icon" />
+          <h3>No employees found</h3>
+          <p>Get started by adding your first employee.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="d-flex justify-content-end mb-2">
-        {filterControl ?? null}
+    <div className="data-table-wrapper">
+      <div className="data-table-header">
+        <h2>{title}</h2>
+        {filterControl}
       </div>
-
-      <Table bordered striped hover responsive className="align-middle mb-0">
-        <thead
-          style={{ backgroundColor: "#2C3E50", color: "#fff", height: "50px" }}
-        >
-          <tr>
-            <th className="fw-bold">First Name</th>
-            <th className="fw-bold">Last Name</th>
-            <th className="fw-bold">Age</th>
-            <th className="fw-bold">Date Of Joining</th>
-            <th className="fw-bold">Title</th>
-            <th className="fw-bold">Department</th>
-            <th className="fw-bold">Employee Type</th>
-            <th className="fw-bold">Status</th>
-            <th className="fw-bold" style={{ width: 80 }}>
-              Details
-            </th>
-            <th className="fw-bold" style={{ width: 80 }}>
-              Delete
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {employees.map((emp) => (
-            <tr
-              key={emp._id}
-              onClick={() => onRowClick(emp._id)}
-              style={{ cursor: "pointer" }}
-            >
-              <td style={{ fontWeight: "normal" }}>{emp.FirstName}</td>
-              <td>{emp.LastName}</td>
-              <td>{emp.Age}</td>
-              <td>{formatDate(emp.DateOfJoining)}</td>
-              <td>{emp.Title}</td>
-              <td>{emp.Department}</td>
-              <td>
-                <Badge bg={typeVariant(emp.EmployeeType)} pill>
-                  {emp.EmployeeType}
-                </Badge>
-              </td>
-              <td>
-                <Badge
-                  bg={isActive(emp.CurrentStatus) ? "success" : "secondary"}
-                  pill
-                >
-                  {isActive(emp.CurrentStatus) ? "Active" : "Inactive"}
-                </Badge>
-              </td>
-              <td>
-                <Button
-                  variant="link"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRowClick(emp._id);
-                  }}
-                >
-                  Details
-                </Button>
-              </td>
-              <td>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(emp._id, emp.CurrentStatus);
-                  }}
-                >
-                  Delete
-                </Button>
-              </td>
+      <div style={{ overflowX: "auto" }}>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Join Date</th>
+              <th>Title</th>
+              <th>Department</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th style={{ width: 120 }}>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {employees.map((emp) => (
+              <tr key={emp._id} onClick={() => onRowClick(emp._id)}>
+                <td>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, var(--primary), var(--primary-dark))",
+                        color: "white",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {emp.FirstName?.[0]}
+                      {emp.LastName?.[0]}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 500, color: "var(--gray-900)" }}>
+                        {emp.FirstName} {emp.LastName}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>{emp.Age}</td>
+                <td>{formatDate(emp.DateOfJoining)}</td>
+                <td>{emp.Title}</td>
+                <td>{emp.Department}</td>
+                <td>
+                  <span className={`badge ${typeVariant(emp.EmployeeType)}`}>
+                    {emp.EmployeeType}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    className={`badge ${
+                      isActive(emp.CurrentStatus) ? "badge-success" : "badge-secondary"
+                    }`}
+                  >
+                    {isActive(emp.CurrentStatus) ? "Active" : "Inactive"}
+                  </span>
+                </td>
+                <td>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      className="btn btn-ghost btn-sm btn-icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRowClick(emp._id);
+                      }}
+                      title="View Details"
+                    >
+                      <BsEye />
+                    </button>
+                    <button
+                      className="btn btn-ghost btn-sm btn-icon"
+                      style={{ color: "var(--danger)" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(emp._id, emp.CurrentStatus);
+                      }}
+                      title="Delete"
+                    >
+                      <BsTrash />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

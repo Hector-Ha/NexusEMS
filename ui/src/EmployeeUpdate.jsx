@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Form, Button, Alert, Spinner, Breadcrumb, Row, Col } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { BsArrowLeft, BsCheck } from "react-icons/bs";
 
 const EmployeeUpdate = () => {
   const { id } = useParams();
@@ -28,14 +28,14 @@ const EmployeeUpdate = () => {
         }
       `;
       try {
-        const response = await fetch('/graphql', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/graphql", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query }),
         });
         const result = await response.json();
         if (result.errors) throw new Error(result.errors[0].message);
-        if (!result.data.staffById) throw new Error('Employee not found');
+        if (!result.data.staffById) throw new Error("Employee not found");
         const data = result.data.staffById;
         setState({
           Title: data.Title || "",
@@ -45,8 +45,8 @@ const EmployeeUpdate = () => {
           success: "",
           loading: false,
         });
-      } catch (error) {
-        setState((prev) => ({ ...prev, error: error.message, loading: false }));
+      } catch (err) {
+        setState((prev) => ({ ...prev, error: err.message, loading: false }));
       }
     };
     fetchEmployee();
@@ -72,9 +72,9 @@ const EmployeeUpdate = () => {
       }
     `;
     try {
-      const response = await fetch('/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/graphql", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           query: mutation,
           variables: { id, Title, Department, CurrentStatus: CurrentStatus === "true" },
@@ -82,70 +82,117 @@ const EmployeeUpdate = () => {
       });
       const result = await response.json();
       if (result.errors) throw new Error(result.errors[0].message);
-      setState({ ...state, error: "", success: "Update Successful!", loading: false });
-      setTimeout(() => navigate(`/employees/${id}`), 1000);
-    } catch (error) {
-      setState({ ...state, error: error.message, loading: false });
+      setState({ ...state, error: "", success: "Employee updated successfully!", loading: false });
+      setTimeout(() => navigate(`/employees/${id}`), 1500);
+    } catch (err) {
+      setState({ ...state, error: err.message, loading: false });
     }
   };
 
-  if (state.loading) return <div className="text-center"><Spinner animation="border" variant="success" /></div>;
-  if (state.error && !state.success) return <Alert variant="danger">{state.error}</Alert>;
+  if (state.loading && !state.Title) {
+    return (
+      <div className="loading-wrapper">
+        <div className="spinner"></div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      
-      <Container className="mt-4">
-        <Row className="justify-content-center">
-          <Col xs={12} md={6}>
-            <div className="p-4 border rounded bg-white shadow">
-              <h3 className="text-center text-success mb-4">Update Employee</h3>
-              {state.error && <Alert variant="danger">{state.error}</Alert>}
-              {state.success && <Alert variant="success">{state.success}</Alert>}
-              <Form onSubmit={submitForm}>
-                <Row>
-                  <Col xs={12} sm={6}>
-                    <Form.Group className="mb-3" controlId="Title">
-                      <Form.Label>Title</Form.Label>
-                      <Form.Select name="Title" value={state.Title} onChange={updateField} required>
-                        <option value="">Select</option>
-                        <option value="Employee">Employee</option>
-                        <option value="Manager">Manager</option>
-                        <option value="Director">Director</option>
-                        <option value="VP">VP</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-                  <Col xs={12} sm={6}>
-                    <Form.Group className="mb-3" controlId="Department">
-                      <Form.Label>Department</Form.Label>
-                      <Form.Select name="Department" value={state.Department} onChange={updateField} required>
-                        <option value="">Select</option>
-                        <option value="IT">IT</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="HR">HR</option>
-                        <option value="Engineering">Engineering</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Form.Group className="mb-3" controlId="CurrentStatus">
-                  <Form.Label>Status</Form.Label>
-                  <Form.Select name="CurrentStatus" value={state.CurrentStatus} onChange={updateField} required>
-                    <option value="">Select</option>
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
-                  </Form.Select>
-                </Form.Group>
-                <Button variant="success" type="submit" className="w-100" disabled={state.loading}>
-                  Update Employee
-                </Button>
-              </Form>
+    <div>
+      <div className="page-header">
+        <Link
+          to={`/employees/${id}`}
+          className="btn btn-ghost btn-sm"
+          style={{ marginBottom: 16, display: "inline-flex" }}
+        >
+          <BsArrowLeft /> Back to Details
+        </Link>
+        <h1>Edit Employee</h1>
+        <p className="subtitle">Update employee information</p>
+      </div>
+
+      <div className="form-card">
+        <div className="header">
+          <h2>Edit Information</h2>
+        </div>
+
+        <div className="body">
+          {state.error && <div className="alert alert-danger">{state.error}</div>}
+          {state.success && <div className="alert alert-success">{state.success}</div>}
+
+          <form onSubmit={submitForm}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div className="form-group">
+                <label className="form-label">Title</label>
+                <select
+                  name="Title"
+                  className="form-select"
+                  value={state.Title}
+                  onChange={updateField}
+                  required
+                >
+                  <option value="">Select title</option>
+                  <option value="Employee">Employee</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Director">Director</option>
+                  <option value="VP">VP</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Department</label>
+                <select
+                  name="Department"
+                  className="form-select"
+                  value={state.Department}
+                  onChange={updateField}
+                  required
+                >
+                  <option value="">Select department</option>
+                  <option value="IT">IT</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="HR">HR</option>
+                  <option value="Engineering">Engineering</option>
+                </select>
+              </div>
             </div>
-          </Col>
-        </Row>
-      </Container>
-    </>
+
+            <div className="form-group">
+              <label className="form-label">Status</label>
+              <select
+                name="CurrentStatus"
+                className="form-select"
+                value={state.CurrentStatus}
+                onChange={updateField}
+                required
+              >
+                <option value="">Select status</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary"
+              style={{ width: "100%" }}
+              disabled={state.loading}
+            >
+              {state.loading ? (
+                <>
+                  <div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }}></div>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <BsCheck /> Update Employee
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 };
 

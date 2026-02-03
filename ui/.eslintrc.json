@@ -25,7 +25,7 @@
     "react/prop-types": "off",
     "react/jsx-uses-react": "off",
     "react/jsx-uses-vars": "error",
-    "no-unused-vars": ["error", { "varsIgnorePattern": "^_" }],
+    "no-unused-vars": ["error", { "varsIgnorePattern": "^_|^React$" }],
     "no-console": "off",
     "eqeqeq": ["error", "always"],
     "semi": ["error", "always"],

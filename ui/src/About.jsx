@@ -1,35 +1,97 @@
-import React from 'react';
-import { Container, Card, Breadcrumb } from 'react-bootstrap';
+import React from "react";
+import {
+  BsPeople,
+  BsShieldCheck,
+  BsGraphUp,
+  BsCalendarCheck,
+} from "react-icons/bs";
 
 const About = () => {
+  const features = [
+    {
+      icon: <BsPeople />,
+      title: "Employee Management",
+      description:
+        "Easily manage employee data including personal details, job titles, departments, and employment status.",
+    },
+    {
+      icon: <BsCalendarCheck />,
+      title: "Retirement Planning",
+      description:
+        "Track upcoming retirements with precise time-to-retirement calculations and advanced filtering.",
+    },
+    {
+      icon: <BsGraphUp />,
+      title: "Analytics Dashboard",
+      description:
+        "Get real-time insights into your workforce with intuitive stats and visual dashboards.",
+    },
+    {
+      icon: <BsShieldCheck />,
+      title: "Secure & Reliable",
+      description:
+        "Built with modern security practices using GraphQL APIs and MongoDB for data integrity.",
+    },
+  ];
+
   return (
-    <>
-      
-      <Container className="mt-4">
-        <Card className="shadow">
-          <Card.Body>
-            <Card.Title className="text-success text-center">About Employee Management System</Card.Title>
-            <Card.Text>
-              <p>
-                Welcome to our Employee Management System (EMS), a robust solution designed to streamline HR processes for businesses of all sizes. Our platform enables efficient management of employee data, including personal details, job titles, departments, and employment status.
-              </p>
-              <p>
-                Built with cutting-edge technologies like React, Bootstrap, and GraphQL, EMS ensures a seamless user experience with a responsive and intuitive interface. Key features include:
-              </p>
-              <ul>
-                <li>Easy employee data entry and updates</li>
-                <li>Advanced filtering for employee types and upcoming retirements</li>
-                <li>Retirement planning with precise time-to-retirement calculations</li>
-                <li>Secure data handling with GraphQL APIs and MongoDB integration</li>
-              </ul>
-              <p>
-                Our mission is to empower organizations to manage their workforce effectively, ensuring compliance and operational efficiency. Contact us at <a href="mailto:support@ems.com">support@ems.com</a> for more information.
-              </p>
-            </Card.Text>
-          </Card.Body>
-        </Card>
-      </Container>
-    </>
+    <div className="about-page">
+      <div className="hero">
+        <h1>About NexusEMS</h1>
+        <p>
+          A robust employee management solution designed to streamline HR processes
+          for businesses of all sizes. Built with modern technologies for a seamless experience.
+        </p>
+      </div>
+
+      <div className="features">
+        {features.map((feature, index) => (
+          <div key={index} className="feature-card">
+            <div className="icon">{feature.icon}</div>
+            <h3>{feature.title}</h3>
+            <p>{feature.description}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="card">
+        <div className="card-body" style={{ textAlign: "center", padding: 40 }}>
+          <h3 style={{ marginBottom: 16, color: "var(--gray-900)" }}>
+            Built with Modern Technologies
+          </h3>
+          <p style={{ color: "var(--gray-500)", marginBottom: 24 }}>
+            React, GraphQL, Node.js, Express, and MongoDB power NexusEMS to deliver
+            a fast, reliable, and scalable employee management experience.
+          </p>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 32,
+              flexWrap: "wrap",
+              color: "var(--gray-400)",
+              fontSize: "0.875rem",
+              fontWeight: 500,
+            }}
+          >
+            <span>React</span>
+            <span>GraphQL</span>
+            <span>Node.js</span>
+            <span>MongoDB</span>
+            <span>Express</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ textAlign: "center", marginTop: 48, color: "var(--gray-500)", fontSize: "0.875rem" }}>
+        <p>
+          Questions or feedback? Contact us at{" "}
+          <a href="mailto:support@nexusems.com" style={{ color: "var(--primary)" }}>
+            support@nexusems.com
+          </a>
+        </p>
+      </div>
+    </div>
   );
 };
 

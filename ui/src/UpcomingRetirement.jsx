@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Form, Alert, Spinner } from "react-bootstrap";
 import StaffGrid from "./StaffGrid.jsx";
 
 const UpcomingRetirement = () => {
@@ -14,7 +13,6 @@ const UpcomingRetirement = () => {
 
   useEffect(() => {
     fetchEmployees();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   const fetchEmployees = async () => {
@@ -58,15 +56,12 @@ const UpcomingRetirement = () => {
     }
   };
 
-  // Treat various "active" encodings as active
   const isActive = (status) =>
     status === true || status === "Active" || status === 1 || status === "1";
 
-  // onDelete now accepts (id, status)
   const handleDelete = async (id, status) => {
-    // Block deletion when active
     if (isActive(status)) {
-      setDeleteError("CAN'T DELETE EMPLOYEE – STATUS ACTIVE");
+      setDeleteError("Cannot delete an active employee. Please deactivate first.");
       setTimeout(() => setDeleteError(""), 5000);
       return;
     }
@@ -88,8 +83,8 @@ const UpcomingRetirement = () => {
 
       if (result.data.deleteStaff) {
         await fetchEmployees();
-        setSuccess("Employee deleted successfully!");
-        setTimeout(() => setSuccess(""), 2000);
+        setSuccess("Employee deleted successfully");
+        setTimeout(() => setSuccess(""), 3000);
       } else {
         throw new Error("Delete operation failed");
       }
@@ -102,64 +97,48 @@ const UpcomingRetirement = () => {
 
   const handleRowClick = (id) => navigate(`/employees/${id}`);
 
+  const filterControl = (
+    <select
+      className="filter-select"
+      value={filter}
+      onChange={(e) => setFilter(e.target.value)}
+    >
+      <option value="All">All Types</option>
+      <option value="FullTime">Full Time</option>
+      <option value="PartTime">Part Time</option>
+      <option value="Contract">Contract</option>
+      <option value="Seasonal">Seasonal</option>
+    </select>
+  );
+
   return (
-    <Container className="mt-4">
-      <h2 className="text-center text-success mb-4">
-        Upcoming Retirement (Next 6 Months)
-      </h2>
+    <div>
+      <div className="page-header">
+        <h1>Upcoming Retirement</h1>
+        <p className="subtitle">Employees retiring within the next 6 months</p>
+      </div>
 
-      {/* Single dismissible alert for active delete block */}
-      {deleteError && (
-        <div
-          className="alert alert-danger alert-dismissible fade show"
-          role="alert"
-        >
-          {deleteError}
-          <button
-            type="button"
-            className="btn-close"
-            data-bs-dismiss="alert"
-            aria-label="Close"
-          ></button>
-        </div>
-      )}
-
-      {error && <Alert variant="danger">{error}</Alert>}
-      {success && <Alert variant="success">{success}</Alert>}
-
-      {loading && (
-        <div className="text-center">
-          <Spinner animation="border" variant="success" />
-        </div>
-      )}
-
-      <Form.Group className="mb-3">
-        <Form.Label>Filter by Employee Type</Form.Label>
-        <Form.Select value={filter} onChange={(e) => setFilter(e.target.value)}>
-          <option value="All">All</option>
-          <option value="FullTime">FullTime</option>
-          <option value="PartTime">PartTime</option>
-          <option value="Contract">Contract</option>
-          <option value="Seasonal">Seasonal</option>
-        </Form.Select>
-      </Form.Group>
+      {deleteError && <div className="alert alert-danger">{deleteError}</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
+      {success && <div className="alert alert-success">{success}</div>}
 
       {!loading && employees.length === 0 && (
-        <Alert variant="info" className="text-center">
+        <div className="alert alert-info">
           No employees have upcoming retirement in the next 6 months
           {filter !== "All" && ` for ${filter} employees`}.
-        </Alert>
+        </div>
       )}
 
       <StaffGrid
         employees={employees}
         loading={loading}
-        error={error}
+        error={null}
         onRowClick={handleRowClick}
         onDelete={handleDelete}
-        showRetirementInfo={true}
+        title="Retirement Schedule"
+        filterControl={filterControl}
       />
-    </Container>
+    </div>
   );
 };
 

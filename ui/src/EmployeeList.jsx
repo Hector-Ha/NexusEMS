@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Container, Form, Alert, Spinner } from 'react-bootstrap';
-import StaffGrid from './StaffGrid.jsx';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import StaffGrid from "./StaffGrid.jsx";
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState('');
-  const [deleteError, setDeleteError] = useState('');
-  const [filter, setFilter] = useState('All');
+  const [success, setSuccess] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [filter, setFilter] = useState("All");
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchEmployees();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   const fetchEmployees = async () => {
@@ -35,9 +33,9 @@ const EmployeeList = () => {
       }
     `;
     try {
-      const response = await fetch('/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/graphql", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query }),
       });
       const result = await response.json();
@@ -45,22 +43,19 @@ const EmployeeList = () => {
       setEmployees(result.data.staffList || []);
       setError(null);
     } catch (err) {
-      setError(err.message || 'Failed to load employees.');
+      setError(err.message || "Failed to load employees.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Treat various "active" encodings as active
   const isActive = (status) =>
-    status === true || status === 'Active' || status === 1 || status === '1';
+    status === true || status === "Active" || status === 1 || status === "1";
 
-  // onDelete now accepts (id, status)
   const handleDelete = async (id, status) => {
-    // Block deletion when active
     if (isActive(status)) {
-      setDeleteError("CAN'T DELETE EMPLOYEE – STATUS ACTIVE");
-      setTimeout(() => setDeleteError(''), 5000);
+      setDeleteError("Cannot delete an active employee. Please deactivate first.");
+      setTimeout(() => setDeleteError(""), 5000);
       return;
     }
 
@@ -71,9 +66,9 @@ const EmployeeList = () => {
       }
     `;
     try {
-      const response = await fetch('/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/graphql", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: mutation }),
       });
       const result = await response.json();
@@ -81,13 +76,13 @@ const EmployeeList = () => {
 
       if (result.data.deleteStaff) {
         await fetchEmployees();
-        setSuccess('Employee deleted successfully!');
-        setTimeout(() => setSuccess(''), 2000);
+        setSuccess("Employee deleted successfully");
+        setTimeout(() => setSuccess(""), 3000);
       } else {
-        throw new Error('Delete operation failed');
+        throw new Error("Delete operation failed");
       }
     } catch (err) {
-      setError(err.message || 'Delete failed.');
+      setError(err.message || "Delete failed.");
     } finally {
       setLoading(false);
     }
@@ -95,51 +90,41 @@ const EmployeeList = () => {
 
   const handleRowClick = (id) => navigate(`/employees/${id}`);
 
+  const filterControl = (
+    <select
+      className="filter-select"
+      value={filter}
+      onChange={(e) => setFilter(e.target.value)}
+    >
+      <option value="All">All Types</option>
+      <option value="FullTime">Full Time</option>
+      <option value="PartTime">Part Time</option>
+      <option value="Contract">Contract</option>
+      <option value="Seasonal">Seasonal</option>
+    </select>
+  );
+
   return (
-    <Container className="mt-4">
-      <h2 className="text-center text-success mb-4">Employee List</h2>
+    <div>
+      <div className="page-header">
+        <h1>Employees</h1>
+        <p className="subtitle">Manage your organization&apos;s workforce</p>
+      </div>
 
-      {/* Single dismissible alert for active delete block */}
-      {deleteError && (
-        <div className="alert alert-danger alert-dismissible fade show" role="alert">
-          {deleteError}
-          <button
-            type="button"
-            className="btn-close"
-            data-bs-dismiss="alert"
-            aria-label="Close"
-          ></button>
-        </div>
-      )}
-
-      {error && <Alert variant="danger">{error}</Alert>}
-      {success && <Alert variant="success">{success}</Alert>}
-
-      {loading && (
-        <div className="text-center">
-          <Spinner animation="border" variant="success" />
-        </div>
-      )}
-
-      <Form.Group className="mb-3">
-        <Form.Label>Filter by Employee Type</Form.Label>
-        <Form.Select value={filter} onChange={(e) => setFilter(e.target.value)}>
-          <option value="All">All</option>
-          <option value="FullTime">FullTime</option>
-          <option value="PartTime">PartTime</option>
-          <option value="Contract">Contract</option>
-          <option value="Seasonal">Seasonal</option>
-        </Form.Select>
-      </Form.Group>
+      {deleteError && <div className="alert alert-danger">{deleteError}</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
+      {success && <div className="alert alert-success">{success}</div>}
 
       <StaffGrid
         employees={employees}
         loading={loading}
-        error={error}
+        error={null}
         onRowClick={handleRowClick}
-        onDelete={handleDelete} 
+        onDelete={handleDelete}
+        title="Employee Directory"
+        filterControl={filterControl}
       />
-    </Container>
+    </div>
   );
 };
 
